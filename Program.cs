@@ -10,6 +10,13 @@ class Program
         using var connection = new ClickHouseConnection(connectionString);
         await connection.OpenAsync();
 
+        // Прогрев соединения
+        using (var warmupCommand = connection.CreateCommand())
+        {
+            warmupCommand.CommandText = "SELECT 1";
+            await warmupCommand.ExecuteScalarAsync();
+        }
+
         var queries = new[]
         {
             "SELECT COUNT(*) FROM fake_share_logs",
